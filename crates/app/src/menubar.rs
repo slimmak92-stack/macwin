@@ -746,7 +746,8 @@ impl Bar {
             v.SetBrush(&b)?;
             v.SetSize(Vector2 { X: w, Y: h })?;
             let (dy, om) = if self.shadow { (1.0 * self.dpi, 0.38) } else { (0.0, 1.0) };
-            v.SetOffset(Vector3 { X: x, Y: y + dy, Z: 0.0 })?;
+            // whole-pixel position: a fractional offset makes the compositor resample (blur) the text
+            v.SetOffset(Vector3 { X: x.round(), Y: (y + dy).round(), Z: 0.0 })?;
             v.SetOpacity(op * om)?;
             parent.Children()?.InsertAtTop(&v)
         };

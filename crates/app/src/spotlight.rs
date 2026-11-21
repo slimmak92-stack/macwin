@@ -926,7 +926,7 @@ impl Spot {
             let v = self.comp.CreateSpriteVisual()?;
             v.SetBrush(&b)?;
             v.SetSize(Vector2 { X: w, Y: h })?;
-            v.SetOffset(Vector3 { X: x, Y: y, Z: 0.0 })?;
+            v.SetOffset(Vector3 { X: x.round(), Y: y.round(), Z: 0.0 })?;
             v.SetOpacity(op)?;
             parent.Children()?.InsertAtTop(&v)
         };

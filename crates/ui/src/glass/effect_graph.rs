@@ -69,7 +69,9 @@ pub fn backdrop_blur_brush(comp: &Compositor, blur_sigma: f32, saturation: f32) 
     let saturation = saturation.clamp(0.0, 2.0);
     const SRC: &str = "backdrop";
     let source: IGraphicsEffectSource = CompositionEffectSourceParameter::Create(&HSTRING::from(SRC))?.cast()?;
-    let blur = D2dEffect::make(CLSID_D2D1GaussianBlur, vec![prop_f32(blur_sigma)?, prop_u32(0)?, prop_u32(1)?], vec![source]);
+    // props: [std deviation, optimization, border mode]. Optimization 0 = SPEED blurs at reduced resolution and
+    // upsamples (blocky/shimmering glass); 2 = QUALITY. Use 1 (BALANCED) if GPU load is too high.
+    let blur = D2dEffect::make(CLSID_D2D1GaussianBlur, vec![prop_f32(blur_sigma)?, prop_u32(2)?, prop_u32(1)?], vec![source]);
     let sat = D2dEffect::make(CLSID_D2D1Saturation, vec![prop_f32(saturation)?], vec![blur.cast()?]);
     let brush = comp.CreateEffectFactory(&sat)?.CreateBrush()?;
     brush.SetSourceParameter(&HSTRING::from(SRC), &comp.CreateBackdropBrush()?)?;

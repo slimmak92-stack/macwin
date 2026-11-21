@@ -17,3 +17,9 @@ Tweak knobs: `LYRIC_LEAD_MS`, glass numbers in `GlassParams::light`.
 6. **Start button** – `app/src/dock/mod.rs`: the Dock's Start item (click and right-click → Open) now opens ABRA's glass
    Apps panel (`launchpad::toggle()`) instead of the plain Windows 10 Start menu, which is a system window ABRA cannot
    restyle. The Win key still opens the normal Windows Start menu.
+7. **Blurry menu bar left side** – `app/src/menubar.rs`: `sprite()` placed text at fractional pixel offsets
+   (`draw_text` centres with `(w - tw) / 2`), so DWM resampled it; the right side used `small_text`, which rounds.
+   Offsets are now rounded in `sprite()`; same fix in `spotlight.rs` and `settings_win.rs` text sprites.
+8. **Low-quality / jaggy glass** – `ui/src/glass/effect_graph.rs`: the backdrop Gaussian blur used D2D optimization
+   mode 0 (SPEED: blurs at reduced resolution then upsamples → blocky, shimmering edges). Now 2 (QUALITY). If GPU
+   use or animation smoothness suffers, set it to 1 (BALANCED).
