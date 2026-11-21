@@ -7,10 +7,13 @@
 3. **Lyrics delay** – `platform/src/media.rs`: SMTC position is now corrected by `LastUpdatedTime` (browsers report it
    rarely, which made lyrics seconds late). `app/src/notch/mod.rs`: lyrics use a 350 ms lead (`LYRIC_LEAD_MS`) and the
    extra 15 ms timer slack was removed.
-4. **Blurry text** – `platform/src/text.rs`: text is rendered at native size (hinted) instead of 3x supersampled then
-   box-filtered, with a small coverage gamma. Composition sprite offsets are rounded to whole pixels
-   (`controlcenter.rs`, `notch/draw.rs`) so surfaces are not resampled.
+4. **Text rendering** – reverted to the original 3x supersampled renderer (`SS = 3`, no gamma) after the native-size
+   attempt looked worse. Only change kept: composition sprite offsets are rounded to whole pixels
+   (`controlcenter.rs`, `notch/draw.rs`).
 5. **Liquid glass** – `ui/src/glass/panel.rs`: stronger saturation, lighter tint, brighter rim, diagonal specular
    sheen with a faint bottom-edge catch-light.
 
-Tweak knobs: `LYRIC_LEAD_MS`, `SS` and the `powf(0.8)` in text.rs, glass numbers in `GlassParams::light`.
+Tweak knobs: `LYRIC_LEAD_MS`, glass numbers in `GlassParams::light`.
+6. **Start button** – `app/src/dock/mod.rs`: the Dock's Start item (click and right-click → Open) now opens ABRA's glass
+   Apps panel (`launchpad::toggle()`) instead of the plain Windows 10 Start menu, which is a system window ABRA cannot
+   restyle. The Win key still opens the normal Windows Start menu.

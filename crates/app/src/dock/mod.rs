@@ -1268,7 +1268,7 @@ impl Dock {
         let Some((idx, entry)) = self.entry_at(x) else { return };
         self.hide_popups();
         match entry {
-            Entry::Start => launch::toggle_start(self.start_open_at_press),
+            Entry::Start => crate::launchpad::toggle(),
             Entry::Launchpad => crate::launchpad::toggle(),
             Entry::App(i) => {
                 let Some(it) = self.items.get(i).cloned() else { return };
@@ -1583,7 +1583,7 @@ impl Dock {
                     launch::open(&it.path);
                 } else if let Some(key) = info.special {
                     if key == START_KEY {
-                        launch::toggle_start(false);
+                        crate::launchpad::toggle();
                     } else {
                         crate::launchpad::toggle();
                     }

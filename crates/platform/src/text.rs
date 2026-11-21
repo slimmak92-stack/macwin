@@ -186,16 +186,13 @@ pub fn render_face(text: &str, style: &Style, face: &str, w: i32, h: i32) -> Opt
                 }
             }
             let a = (sum / (s * s) as u32) as u8;
-            // light-on-glass text looks thin with linear coverage; nudge coverage up slightly
-            let a = ((a as f32 / 255.0).powf(0.8) * 255.0).round() as u8;
             out[(y * w + x) * 4..(y * w + x) * 4 + 4].copy_from_slice(&[a, a, a, a]);
         }
     }
     Some(Bitmap { w: w as u32, h: h as u32, bgra: out })
 }
 
-// 1 = render at native size so GDI hinting keeps stems on the pixel grid (3x supersampling made text soft).
-const SS: i32 = 1;
+const SS: i32 = 3;
 
 fn render_raw(text: &str, style: &Style, face: &str, w: i32, h: i32) -> Option<Bitmap> {
     if w <= 0 || h <= 0 || text.is_empty() {
