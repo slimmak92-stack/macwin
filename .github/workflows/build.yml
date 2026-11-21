@@ -17,17 +17,14 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - name: Build release
-        run: cargo build --release
-
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
 
-      - name: Package (installer + portable zip)
+      - name: Build and package (installer + portable zip)
         shell: pwsh
         run: |
           $env:Path += ";${env:ProgramFiles(x86)}\Inno Setup 6"
-          powershell -File installer\build-installer.ps1 -Version 0.6.0 -NoBuild
+          powershell -File installer\build-installer.ps1 -Version 0.6.0
 
       - uses: actions/upload-artifact@v4
         with:
