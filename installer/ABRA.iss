@@ -28,13 +28,13 @@ OutputBaseFilename=ABRA-Setup-{#AppVersion}
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
-UninstallDisplayName={#AppName}
+UninstallDisplayName=Windows
 UninstallDisplayIcon={app}\{#AppExe}
 SetupIconFile=..\assets\abra.ico
 CloseApplications=no
 
 [Tasks]
-Name: "autostart"; Description: "Launch ABRA when I sign in to Windows"; Flags: unchecked
+Name: "autostart"; Description: "Launch Windows shell when I sign in"; Flags: unchecked
 Name: "startmenu"; Description: "Create a Start menu shortcut"
 
 [Files]
@@ -46,7 +46,7 @@ Source: "..\LICENSE.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\docs\PANDUAN.md"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: startmenu
+Name: "{autoprograms}\Windows"; Filename: "{app}\{#AppExe}"; Tasks: startmenu
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "ABRA"; ValueData: """{app}\{#AppExe}"""; Flags: uninsdeletevalue; Tasks: autostart
@@ -55,7 +55,7 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""ABRA Autostart"" /F"; Flags: runhidden; RunOnceId: "RemoveAbraTask"
 
 [Run]
-Filename: "{app}\{#AppExe}"; Description: "Launch ABRA now"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExe}"; Description: "Launch Windows now"; Flags: nowait postinstall skipifsilent
 Filename: "{app}\{#AppExe}"; Flags: nowait; Check: IsRelaunch
 
 [Code]

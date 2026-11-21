@@ -95,7 +95,7 @@ const HELP: Menu = Menu {
     id: "Bantuan",
     en: "Help",
     lines: &[
-        Line::Cmd { id: "Panduan ABRA", en: "ABRA Guide", accel: "", act: Act::Guide },
+        Line::Cmd { id: "Panduan ABRA", en: "Windows Guide", accel: "", act: Act::Guide },
         Line::Sep,
         k("Bantuan Aplikasi", "App Help", "F1", &[F1]),
     ],

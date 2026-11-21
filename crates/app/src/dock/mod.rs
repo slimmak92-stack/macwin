@@ -170,6 +170,7 @@ pub struct Dock {
     layout: Layout,
 
     surfaces: HashMap<String, CompositionDrawingSurface>,
+    rest_surfaces: HashMap<String, CompositionDrawingSurface>,
     requested: HashSet<String>,
     trash_full: bool,
     worker: icons::Worker,
@@ -397,6 +398,7 @@ impl Dock {
                 views: vec![],
                 layout: Layout { cells: vec![], total: 0.0 },
                 surfaces: HashMap::new(),
+                rest_surfaces: HashMap::new(),
                 requested: HashSet::new(),
                 trash_full: nacre_platform::recycle::is_full(),
                 worker,
@@ -540,6 +542,7 @@ impl Dock {
                 let _ = PostMessageW(Some(HWND(hw as *mut _)), WM_ICONS, WPARAM(0), LPARAM(0));
             });
             self.surfaces.clear();
+            self.rest_surfaces.clear();
             self.requested.clear();
         }
         self.compute_geometry();
@@ -734,7 +737,7 @@ impl Dock {
                 Ok(mut v) => {
                     if let Kind::App { path } = &v.kind {
                         if let Some(s) = self.surfaces.get(path) {
-                            let _ = v.set_surface(&self.comp, s);
+                            let _ = v.set_surface(&self.comp, s, self.rest_surfaces.get(path));
                         } else if self.requested.insert(path.clone()) {
                             let _ = self.worker.requests.send(path.clone());
                         }
@@ -877,11 +880,12 @@ impl Dock {
             return;
         }
         self.surfaces.remove(TRASH_PATH);
+        self.rest_surfaces.remove(TRASH_PATH);
         self.make_trash_surface();
         if let Some(s) = self.surfaces.get(TRASH_PATH).cloned() {
             for v in self.views.iter_mut() {
                 if matches!(&v.kind, Kind::App { path } if path == TRASH_PATH) {
-                    let _ = v.set_surface(&self.comp, &s);
+                    let _ = v.set_surface(&self.comp, &s, None);
                 }
             }
         }
@@ -897,12 +901,25 @@ impl Dock {
                 let p = crate::prefs::get();
                 b.bgra = nacre_core::iconplate::style_icon_v(&b.bgra, p.icon_style, p.icon_tint, crate::prefs::icon_dark());
             }
+            // pre-shrunk copy for the resting size (box filter) so icons don't alias when minified
+            let rest_px = self.m.icon.round().max(16.0) as u32;
+            let rest = if b.w as f32 > rest_px as f32 * 1.25 {
+                let small = icons::fit(icons::Bitmap { w: b.w, h: b.h, bgra: b.bgra.clone() }, rest_px);
+                self.gfx.surface_from_bgra(small.w, small.h, &small.bgra).ok()
+            } else {
+                None
+            };
             match self.gfx.surface_from_bgra(b.w, b.h, &b.bgra) {
                 Ok(surface) => {
                     for v in self.views.iter_mut() {
                         if matches!(&v.kind, Kind::App { path: p } if *p == path) {
-                            let _ = v.set_surface(&self.comp, &surface);
+                            let _ = v.set_surface(&self.comp, &surface, rest.as_ref());
                         }
+                    }
+                    if let Some(r) = rest {
+                        self.rest_surfaces.insert(path.clone(), r);
+                    } else {
+                        self.rest_surfaces.remove(&path);
                     }
                     self.surfaces.insert(path, surface);
                 }
@@ -918,6 +935,7 @@ impl Dock {
             self.icon_key = key;
             nacre_platform::iconpack::configure(&paths::config_dir().join("iconpack"), s.icon_pack);
             self.surfaces.clear();
+            self.rest_surfaces.clear();
             self.requested.clear();
             self.signature.clear();
             self.refresh_windows();
@@ -925,6 +943,7 @@ impl Dock {
         if s.dock_plates != self.plates {
             self.plates = s.dock_plates;
             self.surfaces.clear();
+            self.rest_surfaces.clear();
             self.requested.clear();
             self.signature.clear();
             self.refresh_windows();
@@ -1519,6 +1538,7 @@ impl Dock {
 
     fn reload_icon(&mut self, path: &str) {
         self.surfaces.remove(path);
+        self.rest_surfaces.remove(path);
         self.requested.insert(path.to_string());
         let _ = self.worker.requests.send(path.to_string());
     }
@@ -1655,6 +1675,7 @@ impl Dock {
                 let key = info.special.unwrap_or(START_KEY);
                 custom_icons::reset(key);
                 self.surfaces.remove(key);
+                self.rest_surfaces.remove(key);
                 self.signature.clear();
                 self.refresh_windows();
             }

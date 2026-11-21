@@ -119,7 +119,7 @@ fn tray_data(hwnd: HWND) -> NOTIFYICONDATAW {
         hIcon: tray_icon(),
         ..Default::default()
     };
-    for (i, c) in "ABRA".encode_utf16().enumerate() {
+    for (i, c) in "Windows".encode_utf16().enumerate() {
         nid.szTip[i] = c;
     }
     nid

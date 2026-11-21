@@ -709,7 +709,7 @@ impl Bar {
 
     fn app_label(&self) -> String {
         if self.app.is_empty() {
-            "ABRA".to_string()
+            "Windows".to_string()
         } else {
             self.app.clone()
         }
@@ -1411,7 +1411,7 @@ fn confirm_power(question: &'static str, file: &'static str, params: &'static st
     let text = prefs::tr(question).to_string();
     std::thread::spawn(move || unsafe {
         use windows::core::HSTRING;
-        let r = MessageBoxW(None, &HSTRING::from(text), w!("ABRA"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST | MB_SETFOREGROUND);
+        let r = MessageBoxW(None, &HSTRING::from(text), w!("Windows"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST | MB_SETFOREGROUND);
         if r == IDYES {
             launch::run(file, params);
         }

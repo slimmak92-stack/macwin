@@ -41,6 +41,8 @@ pub struct View {
     pub kind: Kind,
     pub node: ContainerVisual,
     pub icon: Option<SpriteVisual>,
+    /// Large-bitmap sprite stacked over `icon`; fades in as the Deck magnifies (see `set_surface`).
+    pub icon_hi: Option<SpriteVisual>,
     pub dot: Option<SpriteVisual>,
     base_w: f32,
     icon_px: f32,
@@ -61,6 +63,7 @@ impl View {
             kind,
             node,
             icon: None,
+            icon_hi: None,
             dot: None,
             base_w,
             icon_px,
@@ -134,14 +137,40 @@ impl View {
         Ok(v)
     }
 
-    pub fn set_surface(&mut self, comp: &Compositor, surface: &CompositionDrawingSurface) -> Result<()> {
-        if let Some(sprite) = &self.icon {
-            let brush = comp.CreateSurfaceBrushWithSurface(surface)?;
-            brush.SetStretch(CompositionStretch::Uniform)?;
-            let _ = brush.SetBitmapInterpolationMode(windows::UI::Composition::CompositionBitmapInterpolationMode::Linear);
-            sprite.SetBrush(&brush)?;
-            let _ = sprite.SetClip(None::<&windows::UI::Composition::CompositionClip>);
+    /// `surface` is the large bitmap (sharp when magnified). `rest` is an optional copy pre-shrunk with a box filter
+    /// to the resting icon size: bilinear-minifying the large bitmap at rest aliases (jaggy, shimmering icons).
+    /// With `rest`, it is shown at rest and the large one cross-fades in with the magnification scale.
+    pub fn set_surface(&mut self, comp: &Compositor, surface: &CompositionDrawingSurface, rest: Option<&CompositionDrawingSurface>) -> Result<()> {
+        let Some(sprite) = self.icon.clone() else { return Ok(()) };
+        let brush_of = |s: &CompositionDrawingSurface| -> Result<windows::UI::Composition::CompositionSurfaceBrush> {
+            let b = comp.CreateSurfaceBrushWithSurface(s)?;
+            b.SetStretch(CompositionStretch::Uniform)?;
+            let _ = b.SetBitmapInterpolationMode(windows::UI::Composition::CompositionBitmapInterpolationMode::Linear);
+            Ok(b)
+        };
+        if let Some(rest) = rest {
+            sprite.SetBrush(&brush_of(rest)?)?;
+            let hi = match &self.icon_hi {
+                Some(h) => h.clone(),
+                None => {
+                    let h = comp.CreateSpriteVisual()?;
+                    h.SetSize(sprite.Size()?)?;
+                    self.node.Children()?.InsertAtTop(&h)?;
+                    self.icon_hi = Some(h.clone());
+                    h
+                }
+            };
+            hi.SetBrush(&brush_of(surface)?)?;
+            let e = comp.CreateExpressionAnimationWithExpression(&HSTRING::from("Clamp((n.Scale.X - 1.0) / 0.3, 0.0, 1.0)"))?;
+            e.SetReferenceParameter(&HSTRING::from("n"), &self.node)?;
+            hi.StartAnimation(&HSTRING::from("Opacity"), &e)?;
+        } else {
+            sprite.SetBrush(&brush_of(surface)?)?;
+            if let Some(h) = self.icon_hi.take() {
+                let _ = self.node.Children()?.Remove(&h);
+            }
         }
+        let _ = sprite.SetClip(None::<&windows::UI::Composition::CompositionClip>);
         Ok(())
     }
 

@@ -23,3 +23,11 @@ Tweak knobs: `LYRIC_LEAD_MS`, glass numbers in `GlassParams::light`.
 8. **Low-quality / jaggy glass** – `ui/src/glass/effect_graph.rs`: the backdrop Gaussian blur used D2D optimization
    mode 0 (SPEED: blurs at reduced resolution then upsamples → blocky, shimmering edges). Now 2 (QUALITY). If GPU
    use or animation smoothness suffers, set it to 1 (BALANCED).
+9. **Display name "Windows"** – user-visible text only: English UI strings (`core/src/i18n.rs`, EN values), menu-bar
+   label when no app is focused, tray tooltip, confirmation dialog title, Spotlight app label, phone-share page,
+   installer shortcut/uninstall names. Internal names (exe, %APPDATA%\ABRA, autostart entries, update paths,
+   Indonesian lookup keys) are unchanged so settings and updates keep working.
+10. **Sharper Dock icons (two-resolution icons)** – `app/src/dock/view.rs`, `app/src/dock/mod.rs`: each icon now has a
+    pre-shrunk copy (box filter, `icons::fit`) at the resting size plus the large copy. The large sprite sits on top
+    and fades in via a Composition expression (`Clamp((node.Scale.X - 1) / 0.3, 0, 1)`) as the Deck magnifies, so icons
+    are crisp both at rest and when zoomed. Trash/Launchpad items keep the single-bitmap path.

@@ -53,7 +53,7 @@ pub fn human_size(b: u64, en: bool) -> String {
 
 pub fn page(token: &str, files: &[(String, u64)], en: bool) -> String {
     let (title, hint, dl) = if en {
-        ("Sent from ABRA", "Tap a file to save it to this phone.", "Download")
+        ("Sent from Windows", "Tap a file to save it to this phone.", "Download")
     } else {
         ("Dikirim dari ABRA", "Ketuk berkas untuk menyimpannya ke HP ini.", "Unduh")
     };
@@ -67,7 +67,7 @@ pub fn page(token: &str, files: &[(String, u64)], en: bool) -> String {
     }
     format!(
         "<!doctype html><html lang=\"{lang}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\
-<title>ABRA</title><style>\
+<title>Windows</title><style>\
 body{{margin:0;font:16px -apple-system,system-ui,Segoe UI,Roboto,sans-serif;background:#0d0d10;color:#f2f2f5}}\
 main{{max-width:560px;margin:0 auto;padding:28px 18px}}h1{{font-size:22px;margin:0 0 4px}}p{{color:#9a9aa3;margin:0 0 22px}}\
 .f{{display:flex;align-items:center;gap:12px;padding:14px 16px;margin:0 0 10px;border-radius:18px;background:#1c1c22;color:inherit;text-decoration:none}}\
