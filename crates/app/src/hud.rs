@@ -5,7 +5,7 @@ use crate::strip::Strip;
 use nacre_core::hud::slider;
 use nacre_core::hud::timeline::Timeline;
 use nacre_platform::icons::Bitmap;
-use nacre_platform::text::{self, Style, ICON_FACE};
+use nacre_platform::text::{self, Style, icon_face};
 use nacre_platform::{audio, brightness, log, osd, sys};
 use nacre_ui::gfx::Gfx;
 use nacre_ui::glass::{GlassParams, Tier};

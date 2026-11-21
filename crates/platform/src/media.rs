@@ -321,7 +321,26 @@ fn build(session: Option<&GlobalSystemMediaTransportControlsSession>, art_state:
         Ok(t) => {
             let ms = |r: windows::core::Result<windows::Foundation::TimeSpan>| r.map(|v| v.Duration / 10_000).unwrap_or(0);
             let (start, end, pos) = (ms(t.StartTime()), ms(t.EndTime()), ms(t.Position()));
-            (pos, (end - start).max(0))
+            // SMTC reports Position as of LastUpdatedTime (browsers update it rarely). Add the age of
+            // that report so the position is "now", otherwise lyrics lag by seconds.
+            let age = if playing {
+                t.LastUpdatedTime()
+                    .ok()
+                    .and_then(|lu| {
+                        let now_ft = std::time::SystemTime::now()
+                            .duration_since(std::time::UNIX_EPOCH)
+                            .ok()?
+                            .as_nanos() as i64
+                            / 100
+                            + 116_444_736_000_000_000;
+                        let ms = (now_ft - lu.UniversalTime) / 10_000;
+                        (0..=15_000).contains(&ms).then_some(ms)
+                    })
+                    .unwrap_or(0)
+            } else {
+                0
+            };
+            ((pos + age).max(0), (end - start).max(0))
         }
         Err(_) => (0, 0),
     };

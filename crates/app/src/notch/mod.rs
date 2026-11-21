@@ -70,6 +70,7 @@ const T_HIDEWIN: usize = 12;
 const T_GLANCE: usize = 13;
 const T_MINUTE: usize = 14;
 const T_PROGRESS: usize = 15;
+const LYRIC_LEAD_MS: i64 = 350;
 const T_LYRIC: usize = 16;
 const T_PRIVACY: usize = 17;
 const T_DLDONE: usize = 18;
@@ -1079,7 +1080,7 @@ impl Notch {
             tint: self.tint,
             drag: self.seek_drag.map(|(_, _, fr)| fr),
         });
-        let lyrics = LyricsView { lines: self.lyr.as_ref(), state: self.lyr_state, pos_ms, lrclib: self.lyr_lrclib };
+        let lyrics = LyricsView { lines: self.lyr.as_ref(), state: self.lyr_state, pos_ms: self.lyric_pos_ms(), lrclib: self.lyr_lrclib };
         let shelf = self.shelf.items().iter().map(|i| (i.name(), self.shelf_icons.get(&i.path))).collect();
         let drop_count = if self.mode == Mode::Drop { self.dnd.borrow().len() } else { 0 };
         let d = Data {
@@ -1248,20 +1249,26 @@ impl Notch {
         }
     }
 
+    /// Lyrics are shown slightly ahead of the audio clock so the line is already up when it is sung
+    /// (covers SMTC position jitter and the swap animation).
+    fn lyric_pos_ms(&self) -> i64 {
+        self.position_ms() + LYRIC_LEAD_MS
+    }
+
     fn schedule_lyric(&self) {
         kill(self.hwnd, T_LYRIC);
         let Some(l) = &self.lyr else { return };
         if !l.synced || !self.playing {
             return;
         }
-        let pos = self.position_ms();
+        let pos = self.lyric_pos_ms();
         if let Some(next) = l.next_change_ms(pos) {
-            timer(self.hwnd, T_LYRIC, ((next - pos).max(10) + 15).min(60_000) as u32);
+            timer(self.hwnd, T_LYRIC, ((next - pos).max(10)).min(60_000) as u32);
         }
     }
 
     fn on_lyric_tick(&mut self) {
-        let pos = self.position_ms();
+        let pos = self.lyric_pos_ms();
         let idx = self.lyr.as_ref().and_then(|l| l.index_at(pos));
         if idx != self.lyr_idx {
             let forward = matches!((self.lyr_idx, idx), (Some(a), Some(b)) if b == a + 1) || (self.lyr_idx.is_none() && idx == Some(0));

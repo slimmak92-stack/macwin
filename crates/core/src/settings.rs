@@ -425,7 +425,7 @@ impl Default for Settings {
             style: BlurStyle::Clear,
             transparency: 50,
             theme: Theme::Auto,
-            lang: Lang::Id,
+            lang: Lang::En,
             dock_material: Material::Glass,
             dock_round: 62,
             notch_material: Material::Black,

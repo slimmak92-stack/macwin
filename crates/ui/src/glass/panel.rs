@@ -42,10 +42,10 @@ impl GlassParams {
         GlassParams {
             size,
             radius,
-            blur_sigma: 24.0,
-            saturation: 1.6,
-            tint: Color { A: 46, R: 255, G: 255, B: 255 },
-            rim: Color { A: 140, R: 255, G: 255, B: 255 },
+            blur_sigma: 22.0,
+            saturation: 1.9,
+            tint: Color { A: 36, R: 255, G: 255, B: 255 },
+            rim: Color { A: 170, R: 255, G: 255, B: 255 },
             solid: Color { A: 215, R: 226, G: 228, B: 236 },
             highlight: 1.0,
             liquify: false,
@@ -100,10 +100,12 @@ impl GlassPanel {
         let spec = comp.CreateSpriteVisual()?;
         let sg = comp.CreateLinearGradientBrush()?;
         sg.SetStartPoint(Vector2 { X: 0.0, Y: 0.0 })?;
-        sg.SetEndPoint(Vector2 { X: 0.0, Y: 1.0 })?;
+        sg.SetEndPoint(Vector2 { X: 0.55, Y: 1.0 })?;
         let stops = sg.ColorStops()?;
-        stops.Append(&comp.CreateColorGradientStopWithOffsetAndColor(0.0, Color { A: 70, R: 255, G: 255, B: 255 })?)?;
-        stops.Append(&comp.CreateColorGradientStopWithOffsetAndColor(0.34, Color { A: 0, R: 255, G: 255, B: 255 })?)?;
+        stops.Append(&comp.CreateColorGradientStopWithOffsetAndColor(0.0, Color { A: 104, R: 255, G: 255, B: 255 })?)?;
+        stops.Append(&comp.CreateColorGradientStopWithOffsetAndColor(0.30, Color { A: 22, R: 255, G: 255, B: 255 })?)?;
+        stops.Append(&comp.CreateColorGradientStopWithOffsetAndColor(0.62, Color { A: 0, R: 255, G: 255, B: 255 })?)?;
+        stops.Append(&comp.CreateColorGradientStopWithOffsetAndColor(1.0, Color { A: 30, R: 255, G: 255, B: 255 })?)?;
         spec.SetBrush(&sg)?;
         spec.SetClip(&clip)?;
 

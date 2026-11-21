@@ -5,7 +5,7 @@ use crate::popup::Popup;
 use crate::{prefs, services};
 use nacre_core::menubar::{self as lay, Gap, Item as LItem, Placed};
 use nacre_platform::icons::Bitmap;
-use nacre_platform::text::{measure, render, render_face, Style, ICON_FACE};
+use nacre_platform::text::{measure, render, render_face, Style, icon_face};
 use nacre_platform::wins::{enumerate, focus, tracker};
 use nacre_platform::{keys, launch, log, radio, shell, sys, time};
 use nacre_ui::glass::Tier;
@@ -806,7 +806,7 @@ impl Bar {
             Some(v) => v,
             None => {
                 let b = (size * 1.6 * self.dpi).round() as i32;
-                let Some(bmp) = render_face(glyph, &Style { px, weight: 400 }, ICON_FACE, b, b) else { return };
+                let Some(bmp) = render_face(glyph, &Style { px, weight: 400 }, icon_face(), b, b) else { return };
                 let (w, h) = (bmp.w as usize, bmp.h as usize);
                 let (mut x0, mut y0, mut x1, mut y1) = (w, h, 0usize, 0usize);
                 for y in 0..h {

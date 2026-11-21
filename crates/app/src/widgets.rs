@@ -3,7 +3,7 @@ use crate::popup::Popup;
 use crate::{motion, paths, prefs};
 use nacre_core::island::calendar;
 use nacre_core::widgets::{self, Category, Kind, Placed};
-use nacre_platform::text::{measure, render, render_face, Style, ICON_FACE};
+use nacre_platform::text::{measure, render, render_face, Style, icon_face};
 use nacre_platform::{launch, log, sys, time};
 use nacre_ui::gfx::Gfx;
 use nacre_ui::glass::{GlassParams, Tier};
@@ -452,7 +452,7 @@ impl Mgr {
             return Some(v.clone());
         }
         let b = (px as f32 * 1.6) as i32;
-        let bmp = render_face(g, &Style { px, weight: 400 }, ICON_FACE, b, b)?;
+        let bmp = render_face(g, &Style { px, weight: 400 }, icon_face(), b, b)?;
         let surf = self.gfx.as_ref()?.surface_from_bgra(bmp.w, bmp.h, &recolor(&bmp, rgb)).ok()?;
         let v = (surf, bmp.w as i32, bmp.h as i32);
         self.cache.insert(key, v.clone());

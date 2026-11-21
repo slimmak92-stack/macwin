@@ -6,7 +6,7 @@ use nacre_core::symbols::{self, Sym};
 use nacre_platform::icons::Bitmap;
 use nacre_platform::media::{self, ArtUpdate, Command};
 use nacre_platform::radio::{self, Cmd as RadioCmd, Kind as RK};
-use nacre_platform::text::{measure, render, render_face, Style, ICON_FACE};
+use nacre_platform::text::{measure, render, render_face, Style, icon_face};
 use nacre_platform::{audio, brightness, keys, launch, wifi};
 use nacre_ui::glass::{GlassPanel, GlassParams, Tier};
 use nacre_ui::gfx::Gfx;
@@ -398,7 +398,7 @@ impl Cc {
             return Some(v.clone());
         }
         let b = (px as f32 * 1.6) as i32;
-        let bmp = render_face(g, &Style { px, weight: 400 }, ICON_FACE, b, b)?;
+        let bmp = render_face(g, &Style { px, weight: 400 }, icon_face(), b, b)?;
         let (w, h) = (bmp.w as usize, bmp.h as usize);
         let (mut x0, mut y0, mut x1, mut y1) = (w, h, 0usize, 0usize);
         for y in 0..h {
@@ -455,7 +455,7 @@ impl Cc {
             let v = self.comp.CreateSpriteVisual()?;
             v.SetBrush(&b)?;
             v.SetSize(Vector2 { X: w, Y: h })?;
-            v.SetOffset(Vector3 { X: x, Y: y, Z: 0.0 })?;
+            v.SetOffset(Vector3 { X: x.round(), Y: y.round(), Z: 0.0 })?;
             v.SetOpacity(op)?;
             parent.Children()?.InsertAtTop(&v)
         };

@@ -4,7 +4,7 @@ use nacre_core::hud::slider;
 use nacre_core::i18n::Lang;
 use nacre_core::settings::{Behavior, Material, Theme};
 use nacre_platform::icons::Bitmap;
-use nacre_platform::text::{measure, render, render_face, Style, ICON_FACE};
+use nacre_platform::text::{measure, render, render_face, Style, icon_face};
 use nacre_platform::{log, sys};
 use nacre_ui::gfx::Gfx;
 use std::cell::RefCell;
@@ -433,7 +433,7 @@ impl Win {
         let (surf, w, h) = match hit {
             Some(v) => v,
             None => {
-                let Some(bmp) = render_face(g, &Style { px, weight: 400 }, ICON_FACE, b, b) else { return };
+                let Some(bmp) = render_face(g, &Style { px, weight: 400 }, icon_face(), b, b) else { return };
                 let Some((cd, cw, ch)) = nacre_core::symbols::crop_ink(&recolor(&bmp, rgb), bmp.w, bmp.h) else { return };
                 let Ok(sf) = self.gfx.surface_from_bgra(cw, ch, &cd) else { return };
                 let v = (sf, cw as i32, ch as i32);
